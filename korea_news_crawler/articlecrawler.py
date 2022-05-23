@@ -76,7 +76,9 @@ class ArticleCrawler(object):
 
     @staticmethod
     def make_news_page_url(category_url, date):
+        
         made_urls = []
+
         for year in range(date['start_year'], date['end_year'] + 1):
             if date['start_year'] == date['end_year']:
                 target_start_month = date['start_month']
@@ -121,6 +123,14 @@ class ArticleCrawler(object):
                     totalpage = ArticleParser.find_news_totalpage(url + "&page=10000")
                     for page in range(1, totalpage + 1):
                         made_urls.append(url + "&page=" + str(page))
+                    
+        #             custom = []
+        #             idxNumb = 0;
+        #             for url in made_urls:
+        #                 custom.append(url);
+        #                 idxNumb = idxNumb + 1;
+        #                 if idxNumb == 50:break
+        # return custom
         return made_urls
 
     @staticmethod
@@ -137,16 +147,18 @@ class ArticleCrawler(object):
     def crawling(self, category_name):
         # Multi Process PID
         print(category_name + " PID: " + str(os.getpid()))    
-
         writer = Writer(category='Article', article_category=category_name, date=self.date)
+
         # 기사 url 형식
         url_format = f'http://news.naver.com/main/list.nhn?mode=LSD&mid=sec&sid1={self.categories.get(category_name)}&date='
+
         # start_year년 start_month월 start_day일 부터 ~ end_year년 end_month월 end_day일까지 기사를 수집합니다.
         target_urls = self.make_news_page_url(url_format, self.date)
-        print(f'{category_name} Urls are generated')
 
         print(f'{category_name} is collecting ...')
+
         for url in target_urls:
+            
             request = self.get_url_data(url)
             document = BeautifulSoup(request.content, 'html.parser')
 
@@ -175,41 +187,56 @@ class ArticleCrawler(object):
                     continue
 
                 try:
+                    
+                    # print([time, category_name, text_company, text_headline, text_sentence, content_url])
+
                     # 기사 제목 가져옴
-                    tag_headline = document_content.find_all('h3', {'id': 'articleTitle'}, {'class': 'tts_head'})
+                    # tag_headline = document_content.find_all('h3', {'id': 'articleTitle'}, {'class': 'tts_head'})
+                    tag_headline = document_content.find_all('h2', {'class': 'media_end_head_headline'})
+                    
                     # 뉴스 기사 제목 초기화
                     text_headline = ''
                     text_headline = text_headline + ArticleParser.clear_headline(str(tag_headline[0].find_all(text=True)))
+                    
                     # 공백일 경우 기사 제외 처리
-                    if not text_headline:
-                        continue
+                    # if not text_headline:
+                        # continue
 
                     # 기사 본문 가져옴
-                    tag_content = document_content.find_all('div', {'id': 'articleBodyContents'})
+                    # tag_content = document_content.find_all('div', {'id': 'articleBodyContents'})
+                    tag_content = document_content.find_all('div', {'id':'dic_area'})
+
                     # 뉴스 기사 본문 초기화
                     text_sentence = ''
                     text_sentence = text_sentence + ArticleParser.clear_content(str(tag_content[0].find_all(text=True)))
+
                     # 공백일 경우 기사 제외 처리
-                    if not text_sentence:
-                        continue
+                    # if not text_sentence:
+                        # continue
 
                     # 기사 언론사 가져옴
-                    tag_company = document_content.find_all('meta', {'property': 'me2:category1'})
+                    # $('meta[name="twitter:creator"]').attr('content')
+                    # tag_company = document_content.find_all('meta', {'property': 'me2:category1'})
+                    tag_company = document_content.find_all('meta', {'name': 'twitter:creator'})
 
                     # 언론사 초기화
                     text_company = ''
                     text_company = text_company + str(tag_company[0].get('content'))
 
                     # 공백일 경우 기사 제외 처리
-                    if not text_company:
-                        continue
+                    # if not text_company:
+                    #     continue
 
                     # 기사 시간대 가져옴
-                    time = re.findall('<span class="t11">(.*)</span>',request_content.text)[0]
+
+                    # time = re.findall('<span class="t11">(.*)</span>',request_content.text)[0]
+                    # time = re.findall('<span class="media_end_head_info_datestamp_time _ARTICLE_DATE_TIME">(.*)</span>',request_content.text)[0]
+                    time = document_content.find('span', {'class': 'media_end_head_info_datestamp_time _ARTICLE_DATE_TIME'}).text
 
                     # CSV 작성
+                    print([time, category_name, text_company, text_headline, text_sentence, content_url])
                     writer.write_row([time, category_name, text_company, text_headline, text_sentence, content_url])
-
+                    
                     del time
                     del text_company, text_sentence, text_headline
                     del tag_company 
@@ -220,6 +247,7 @@ class ArticleCrawler(object):
                 except Exception as ex:
                     del request_content, document_content
                     pass
+
         writer.close()
 
     def start(self):
@@ -230,7 +258,12 @@ class ArticleCrawler(object):
 
 
 if __name__ == "__main__":
+    print("__main__")
     Crawler = ArticleCrawler()
-    Crawler.set_category('생활문화')
-    Crawler.set_date_range('2018-01', '2018-02')
+    Crawler.set_category('정치')
+    Crawler.set_date_range('2022-05-17', '2022-05-17')
     Crawler.start()
+
+
+        # self.categories = {'정치': 100, '경제': 101, '사회': 102, '생활문화': 103, '세계': 104, 'IT과학': 105, '오피니언': 110,
+        #                    'politics': 100, 'economy': 101, 'society': 102, 'living_culture': 103, 'world': 104, 'IT_science': 105, 'opinion': 110}
