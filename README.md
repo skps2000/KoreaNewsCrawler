@@ -1,10 +1,7 @@
 
 # SKPS_CRAWLLER
   pip install KoreaNewsCrawler
-
-
-
-
+  C:/ProgramData/Anaconda3/python.exe c:/Users/82109/Documents/GitHub/0509/KoreaNewsCrawler/korea_news_crawler/articlecrawler.py
 
 
 # KoreaNewsCrawler
