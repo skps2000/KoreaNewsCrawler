@@ -260,8 +260,8 @@ class ArticleCrawler(object):
 if __name__ == "__main__":
     print("__main__")
     Crawler = ArticleCrawler()
-    Crawler.set_category('정치')
-    Crawler.set_date_range('2022-05-17', '2022-05-17')
+    Crawler.set_category('IT과학')
+    Crawler.set_date_range('2022-05-23', '2022-05-23')
     Crawler.start()
 
 

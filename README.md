@@ -1,3 +1,12 @@
+
+# SKPS_CRAWLLER
+  pip install KoreaNewsCrawler
+
+
+
+
+
+
 # KoreaNewsCrawler
 
 이 크롤러는 네이버 포털에 올라오는 언론사 뉴스 기사들을 크롤링 해주는 크롤러입니다.  
