@@ -72,7 +72,7 @@ class ArticleCrawler(object):
 
         for key, date in zip(self.date, args):
             self.date[key] = date
-        print(self.date)
+        # print(self.date)
 
     @staticmethod
     def make_news_page_url(category_url, date):
@@ -146,7 +146,7 @@ class ArticleCrawler(object):
 
     def crawling(self, category_name):
         # Multi Process PID
-        print(category_name + " PID: " + str(os.getpid()))    
+        # print(category_name + " PID: " + str(os.getpid()))    
         writer = Writer(category='Article', article_category=category_name, date=self.date)
 
         # 기사 url 형식
@@ -234,7 +234,7 @@ class ArticleCrawler(object):
                     time = document_content.find('span', {'class': 'media_end_head_info_datestamp_time _ARTICLE_DATE_TIME'}).text
 
                     # CSV 작성
-                    print([time, category_name, text_company, text_headline, text_sentence, content_url])
+                    # print([time, category_name, text_company, text_headline, text_sentence, content_url])
                     writer.write_row([time, category_name, text_company, text_headline, text_sentence, content_url])
                     
                     del time
@@ -260,7 +260,7 @@ class ArticleCrawler(object):
 if __name__ == "__main__":
     print("__main__")
     Crawler = ArticleCrawler()
-    Crawler.set_category('IT과학')
+    Crawler.set_category('IT_science')
     Crawler.set_date_range('2022-05-23', '2022-05-23')
     Crawler.start()
 
