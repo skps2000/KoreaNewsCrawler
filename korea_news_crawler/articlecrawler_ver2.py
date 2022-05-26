@@ -6,6 +6,8 @@ import platform
 import calendar
 import requests
 import re
+import sys
+
 from time import sleep
 from bs4 import BeautifulSoup
 from multiprocessing import Process
@@ -177,7 +179,7 @@ class ArticleCrawler(object):
                 try:
                     document_content = BeautifulSoup(request_content.content, 'html.parser')
                 except:
-                    # print('ArticleCrawler', 'error : line 180')
+                    print('ArticleCrawler', 'error : line 180')
                     continue
 
                 try:
@@ -239,6 +241,7 @@ class ArticleCrawler(object):
 
                 # UnicodeEncodeError
                 except Exception as ex:
+                    print('ERROR : ArticleCrawler Line242', ex)
                     del request_content, document_content
                     pass
 
@@ -253,9 +256,11 @@ class ArticleCrawler(object):
 
 if __name__ == "__main__":
     print("__main__")
+    print(sys.argv)
+    
     Crawler = ArticleCrawler()
-    Crawler.set_category('IT_science')
-    Crawler.set_date_range('2022-05-25', '2022-05-25')
+    Crawler.set_category(sys.argv[3])
+    Crawler.set_date_range(sys.argv[1], sys.argv[2])
     Crawler.start()
 
 
