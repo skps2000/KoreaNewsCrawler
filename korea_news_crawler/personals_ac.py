@@ -4,9 +4,11 @@
 import os
 import platform
 import calendar
+import sys
 import requests
 import re
-import sys
+from datetime import datetime as dt
+import pytz
 
 from time import sleep
 from bs4 import BeautifulSoup
@@ -14,6 +16,8 @@ from multiprocessing import Process
 from korea_news_crawler.exceptions import *
 from korea_news_crawler.articleparser import ArticleParser
 from korea_news_crawler.writer import Writer
+
+
 
 class ArticleCrawler(object):
     def __init__(self):
@@ -179,7 +183,7 @@ class ArticleCrawler(object):
                 try:
                     document_content = BeautifulSoup(request_content.content, 'html.parser')
                 except:
-                    print('ArticleCrawler', 'error : line 180')
+                    # print('ArticleCrawler', 'error : line 180')
                     continue
 
                 try:
@@ -241,7 +245,6 @@ class ArticleCrawler(object):
 
                 # UnicodeEncodeError
                 except Exception as ex:
-                    print('ERROR : ArticleCrawler Line244', ex)
                     del request_content, document_content
                     pass
 
@@ -253,16 +256,20 @@ class ArticleCrawler(object):
             proc = Process(target=self.crawling, args=(category_name,))
             proc.start()
 
-
 if __name__ == "__main__":
     
+    KST = pytz.timezone('Asia/Seoul')
+    currDt = dt.now(KST).date().isoformat()
+
+    print(currDt)
+
     Crawler = ArticleCrawler()
-
-    print("__main__")
-    print(sys.argv)
-
-    #Crawler.set_category('politics','economy','society','living_culture','world','IT_science','opinion')
-    Crawler.set_category('IT_science')
-    Crawler.set_category(sys.argv[3])
-    Crawler.set_date_range(sys.argv[1], sys.argv[2])
+    Crawler.set_category('politics','economy','society','living_culture','world','IT_science','opinion')
+    Crawler.set_date_range(currDt, currDt)
+    # Crawler.set_date_range('2022-05-25', '2022-05-25')
     Crawler.start()
+    
+    # Crawler.set_category('IT_science')
+    # Crawler.set_category(sys.argv[3])
+    # Crawler.set_date_range(sys.argv[1], sys.argv[2])
+    # Crawler.start()
